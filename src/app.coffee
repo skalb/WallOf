@@ -1,13 +1,6 @@
 tags = "espresso"
 
-content_index = {
-  "up": 0,
-  "down": 0,
-  "left": 0,
-  "right": 0
-}
-
-@create_canvas = ->
+@load_images = ->
   $.get("http://api.flickr.com/services/rest/?format=json&sort=relevance&method=flickr.photos.search&tags=#{tags}&api_key=a40767668cb729440a94acc78cd1e54b")
   .error (jqXHR, textStatus, errorThrown) -> 
     $('body').append "AJAX Error: #{errorThrown}."
@@ -24,8 +17,9 @@ content_index = {
 rows = Math.ceil($(window).height() / 150)
 cols = Math.ceil($(window).width() / 150)
 
-left_position = 0
-top_position = 0
+last_left_position = 0
+last_top_position = 0
+last_top_offset = 0
 direction = "down"
 is_loading = false
 
@@ -36,25 +30,25 @@ is_loading = false
       pairs.push({r: r, c: c})
   pairs
 
-@jsonFlickrApi = (data) ->
-  pairs = get_pairs()
+pairs_to_fill = get_pairs()
+shuffle(pairs_to_fill)
 
-  shuffle(pairs)
-  # $('#main').append("<canvas id=\"content\" class=\"image_canvas\" height=\"#{rows * 150}px\" width=\"#{cols * 150}px\"></canvas>")
-  # $("#content").
-  #   css('position', 'absolute').
-  #   css('top', top_position).
-  #   css('left', left_position)
+@jsonFlickrApi = (data) ->
   $('#main').draggable()
-  $('#main').bind("drag", (event, ui) ->
+  $('#main').bind("dragstop", (event, ui) ->
     if (is_loading)
       return
-
+      
     should_create = false
-    # if (ui.offset.top < -75 - (rows * 150 * (content_index["down"] - 1)))
-    #   direction = "down"
-    #   should_create = true
-    #   top_position = (rows * 150 * (content_index["down"]))
+    pairs_to_fill = []
+    if (ui.offset.top > last_top_position)
+      should_create = true
+      top_offset = -Math.ceil((ui.offset.top) / 150)
+      for r in [top_offset..last_top_offset-1]
+        for c in [0..cols-1]
+          pairs_to_fill.push({r: r, c: c})
+      last_top_position += 150
+      last_top_offset = top_offset
 
     # if (ui.offset.top > 75 + rows * 150 * (content_index["up"]))
     #   direction = "up"
@@ -72,22 +66,20 @@ is_loading = false
     if should_create
       is_loading = true
       $(this).unbind(event)
-      # create_canvas()
+      load_images()
   )
   photos = data['photos']['photo']
   shuffle(photos)
-  for i in [0..pairs.length-1]
+  for i in [0..pairs_to_fill.length-1]
     do(i) ->
       setTimeout( ->
-        pair = pairs[i]
+        pair = pairs_to_fill[i]
         photo = data['photos']['photo'][i]
         img_src = "http://farm#{photo.farm}.staticflickr.com/#{photo.server}/#{photo.id}_#{photo.secret}_q.jpg"
-        img_tag = "<img src=\"#{img_src}\" style=\"position: absolute; top: #{pair.r * 150}px; left: #{pair.c * 150}px;\">"
-        $('#main').append(img_tag)
+        $('#main').append("<img src=\"#{img_src}\" style=\"position: absolute; top: #{pair.r * 150}px; left: #{pair.c * 150}px;\">")
       , 10 * i)
 
-  content_index[direction] += 1
   is_loading = false
 
-create_canvas()
+load_images()
 
