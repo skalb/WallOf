@@ -24,8 +24,8 @@ content_index = {
 rows = Math.ceil($(window).height() / 150)
 cols = Math.ceil($(window).width() / 150)
 
-x_offset = 0
-y_offset = 0
+left_position = 0
+top_position = 0
 direction = "down"
 is_loading = false
 
@@ -40,52 +40,50 @@ is_loading = false
   pairs = get_pairs()
 
   shuffle(pairs)
-  $('#main').append("<canvas id=\"content-#{content_index[direction]}-#{direction}\" class=\"image_canvas\" height=\"#{rows * 150}px\" width=\"#{cols * 150}px\"></canvas>")
-  $("#content-#{content_index[direction]}-#{direction}").
-    css('position', 'absolute').
-    css('top', y_offset).
-    css('left', x_offset)
-  $('#main').draggableXY()
+  # $('#main').append("<canvas id=\"content\" class=\"image_canvas\" height=\"#{rows * 150}px\" width=\"#{cols * 150}px\"></canvas>")
+  # $("#content").
+  #   css('position', 'absolute').
+  #   css('top', top_position).
+  #   css('left', left_position)
+  $('#main').draggable()
   $('#main').bind("drag", (event, ui) ->
     if (is_loading)
       return
 
     should_create = false
-    if (ui.offset.top < -75 - (rows * 150 * (content_index["down"] - 1)))
-      direction = "down"
-      should_create = true
-      y_offset = (rows * 150 * (content_index["down"]))
-    if (ui.offset.top > 75 + rows * 150 * (content_index["up"]))
-      direction = "up"
-      should_create = true
-      y_offset = (rows * -150 * (content_index["up"] + 1))
-    if (ui.offset.left > 75 + cols * 150 * (content_index["left"]))
-      direction = "left"
-      should_create = true
-      x_offset = (cols * -150 * (content_index["left"] + 1)) 
-    if (ui.offset.left < -75 - cols * 150 * (content_index["right"]))
-      direction = "right"
-      should_create = true
-      x_offset = (cols * 150 * (content_index["right"] + 1)) 
+    # if (ui.offset.top < -75 - (rows * 150 * (content_index["down"] - 1)))
+    #   direction = "down"
+    #   should_create = true
+    #   top_position = (rows * 150 * (content_index["down"]))
+
+    # if (ui.offset.top > 75 + rows * 150 * (content_index["up"]))
+    #   direction = "up"
+    #   should_create = true
+    #   top_position = (rows * -150 * (content_index["up"] + 1))
+    # if (ui.offset.left > 75 + cols * 150 * (content_index["left"]))
+    #   direction = "left"
+    #   should_create = true
+    #   left_position = (cols * -150 * (content_index["left"] + 1)) 
+    # if (ui.offset.left < -75 - cols * 150 * (content_index["right"]))
+    #   direction = "right"
+    #   should_create = true
+    #   left_position = (cols * 150 * (content_index["right"] + 1)) 
 
     if should_create
       is_loading = true
       $(this).unbind(event)
-      create_canvas()
+      # create_canvas()
   )
-  context = document.getElementById("content-#{content_index[direction]}-#{direction}").getContext("2d")
   photos = data['photos']['photo']
   shuffle(photos)
   for i in [0..pairs.length-1]
     do(i) ->
       setTimeout( ->
-        img = new Image()  
         pair = pairs[i]
-        do (img, pair) ->
-            img.onload = ->
-                context.drawImage(img, pair.c * 150, pair.r * 150, 150, 150)
         photo = data['photos']['photo'][i]
-        img.src = "http://farm#{photo.farm}.staticflickr.com/#{photo.server}/#{photo.id}_#{photo.secret}_q.jpg"
+        img_src = "http://farm#{photo.farm}.staticflickr.com/#{photo.server}/#{photo.id}_#{photo.secret}_q.jpg"
+        img_tag = "<img src=\"#{img_src}\" style=\"position: absolute; top: #{pair.r * 150}px; left: #{pair.c * 150}px;\">"
+        $('#main').append(img_tag)
       , 10 * i)
 
   content_index[direction] += 1
