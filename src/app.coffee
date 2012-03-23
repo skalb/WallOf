@@ -19,9 +19,16 @@ cols = Math.ceil($(window).width() / 150)
 
 last_left_position = 0
 last_left_offset = 0
+
 last_top_position = 0
 last_top_offset = 0
-direction = "down"
+
+last_bottom_position = 0
+last_bottom_offset = rows - 1
+
+last_right_position = 0
+last_right_offset = 0
+
 is_loading = false
 
 @get_pairs = ->
@@ -45,11 +52,20 @@ shuffle(pairs_to_fill)
     if (ui.offset.top > last_top_position)
       should_create = true
       top_offset = -Math.ceil((ui.offset.top) / 150)
-      for r in [top_offset..last_top_offset-1-]
+      for r in [top_offset..last_top_offset-1]
         for c in [last_left_offset..cols-1-last_left_offset]
           pairs_to_fill.push({r: r, c: c})
       last_top_position += 150
       last_top_offset = top_offset
+
+    if (ui.offset.top < last_bottom_position)
+      should_create = true
+      bottom_offset = -Math.ceil((ui.offset.top) / 150) + rows 
+      for r in [last_bottom_offset + 1..bottom_offset]
+        for c in [last_left_offset..cols-1-last_left_offset]
+          pairs_to_fill.push({r: r, c: c})
+      last_bottom_offset -= 150
+      last_bottom_offset = bottom_offset
 
     if (ui.offset.left > last_left_position)
       should_create = true
