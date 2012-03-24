@@ -1,5 +1,7 @@
 tags = "espresso"
 
+filled_pairs = {}
+
 @load_images = ->
   $.get("http://api.flickr.com/services/rest/?format=json&sort=relevance&method=flickr.photos.search&tags=#{tags}&api_key=a40767668cb729440a94acc78cd1e54b")
   .error (jqXHR, textStatus, errorThrown) -> 
@@ -96,9 +98,16 @@ shuffle(pairs_to_fill)
   photos = data['photos']['photo']
   shuffle(photos)
   for i in [0..pairs_to_fill.length-1]
-    do(i) ->
+    pair = pairs_to_fill[i]
+    if (!filled_pairs[pair.r])
+      filled_pairs[pair.r] = {}
+    else
+      if (!filled_pairs[pair.r][pair.c]))
+        filled_pairs[pair.r][pair.c] = 1
+      else
+        continue
+    do(pair, i) ->
       setTimeout( ->
-        pair = pairs_to_fill[i]
         photo = data['photos']['photo'][i]
         img_src = "http://farm#{photo.farm}.staticflickr.com/#{photo.server}/#{photo.id}_#{photo.secret}_q.jpg"
         $('#main').append("<img src=\"#{img_src}\" style=\"position: absolute; top: #{pair.r * 150}px; left: #{pair.c * 150}px;\">")
