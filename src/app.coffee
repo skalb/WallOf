@@ -27,7 +27,7 @@ last_bottom_position = 0
 last_bottom_offset = rows - 1
 
 last_right_position = 0
-last_right_offset = 0
+last_right_offset = cols - 1
 
 is_loading = false
 
@@ -62,7 +62,7 @@ shuffle(pairs_to_fill)
       should_create = true
       bottom_offset = -Math.ceil((ui.offset.top) / 150) + rows 
       for r in [last_bottom_offset + 1..bottom_offset]
-        for c in [last_left_offset..cols-1-last_left_offset]
+        for c in [last_left_offset..cols+last_left_offset]
           pairs_to_fill.push({r: r, c: c})
       last_bottom_offset -= 150
       last_bottom_offset = bottom_offset
@@ -76,18 +76,14 @@ shuffle(pairs_to_fill)
       last_left_position += 150
       last_left_offset = left_offset
 
-    # if (ui.offset.top > 75 + rows * 150 * (content_index["up"]))
-    #   direction = "up"
-    #   should_create = true
-    #   top_position = (rows * -150 * (content_index["up"] + 1))
-    # if (ui.offset.left > 75 + cols * 150 * (content_index["left"]))
-    #   direction = "left"
-    #   should_create = true
-    #   left_position = (cols * -150 * (content_index["left"] + 1)) 
-    # if (ui.offset.left < -75 - cols * 150 * (content_index["right"]))
-    #   direction = "right"
-    #   should_create = true
-    #   left_position = (cols * 150 * (content_index["right"] + 1)) 
+    if (ui.offset.left < last_right_position)
+      should_create = true
+      right_offset = -Math.ceil((ui.offset.left) / 150) + cols 
+      for r in [last_top_offset..rows-last_top_offset]
+        for c in [last_right_offset + 1..right_offset]
+          pairs_to_fill.push({r: r, c: c})
+      last_right_offset -= 150
+      last_right_offset = right_offset
 
     shuffle(pairs_to_fill)
 
