@@ -9,18 +9,36 @@
 
   filled_pairs = {};
 
-  $('document').ready(function() {
-    return $('#tag_input').change(function() {
-      tags = $(this).val();
-      photos = [];
-      filled_pairs = {};
-      $('.grid_image').fadeOut('slow', function() {
-        return $(this).remove();
-      });
-      set_pairs();
-      return load_images();
-    });
-  });
+  rows = Math.ceil($(window).height() / 150);
+
+  cols = Math.ceil($(window).width() / 150);
+
+  last_left_position = 0;
+
+  last_left_offset = 0;
+
+  last_top_position = 0;
+
+  last_top_offset = 0;
+
+  last_bottom_position = 0;
+
+  last_bottom_offset = rows - 1;
+
+  last_right_position = 0;
+
+  last_right_offset = cols - 1;
+
+  this.reset_grid = function() {
+    last_left_position = 0;
+    last_left_offset = 0;
+    last_top_position = 0;
+    last_top_offset = 0;
+    last_bottom_position = 0;
+    last_bottom_offset = rows - 1;
+    last_right_position = 0;
+    return last_right_offset = cols - 1;
+  };
 
   this.load_images = function() {
     if (photos.length > 0) {
@@ -45,26 +63,6 @@
     }
     return _results;
   };
-
-  rows = Math.ceil($(window).height() / 150);
-
-  cols = Math.ceil($(window).width() / 150);
-
-  last_left_position = 0;
-
-  last_left_offset = 0;
-
-  last_top_position = 0;
-
-  last_top_offset = 0;
-
-  last_bottom_position = 0;
-
-  last_bottom_offset = rows - 1;
-
-  last_right_position = 0;
-
-  last_right_offset = cols - 1;
 
   this.set_pairs = function() {
     var c, r, _ref, _ref2;
@@ -169,8 +167,19 @@
     return _results;
   };
 
-  set_pairs();
-
-  load_images();
+  $('document').ready(function() {
+    $('#tag_input').change(function() {
+      tags = $(this).val();
+      photos = [];
+      filled_pairs = {};
+      $('.grid_image').fadeOut('slow', function() {
+        return $(this).remove();
+      });
+      set_pairs();
+      return load_images();
+    });
+    set_pairs();
+    return load_images();
+  });
 
 }).call(this);

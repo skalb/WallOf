@@ -3,18 +3,33 @@ photos = []
 pairs_to_fill = []
 filled_pairs = {}
 
-$('document').ready( ->
-  $('#tag_input').change( ->
-    tags = $(this).val()
-    photos = []
-    filled_pairs = {}
-    $('.grid_image').fadeOut('slow', -> 
-      $(this).remove()
-    )
-    set_pairs()
-    load_images()
-  )
-)
+rows = Math.ceil($(window).height() / 150)
+cols = Math.ceil($(window).width() / 150)
+
+last_left_position = 0
+last_left_offset = 0
+
+last_top_position = 0
+last_top_offset = 0
+
+last_bottom_position = 0
+last_bottom_offset = rows - 1
+
+last_right_position = 0
+last_right_offset = cols - 1
+
+@reset_grid = ->
+  last_left_position = 0
+  last_left_offset = 0
+
+  last_top_position = 0
+  last_top_offset = 0
+
+  last_bottom_position = 0
+  last_bottom_offset = rows - 1
+
+  last_right_position = 0
+  last_right_offset = cols - 1
 
 @load_images = ->
   if photos.length > 0
@@ -32,21 +47,6 @@ $('document').ready( ->
     a[j] = a[n]
     a[n] = temp
     n -= 1
-
-rows = Math.ceil($(window).height() / 150)
-cols = Math.ceil($(window).width() / 150)
-
-last_left_position = 0
-last_left_offset = 0
-
-last_top_position = 0
-last_top_offset = 0
-
-last_bottom_position = 0
-last_bottom_offset = rows - 1
-
-last_right_position = 0
-last_right_offset = cols - 1
 
 @set_pairs = ->
   pairs_to_fill = []
@@ -117,6 +117,19 @@ last_right_offset = cols - 1
     $('#main').append("<img id=\"row#{pair.r}col#{pair.c}\" class=\"grid_image\" src=\"#{img_src}\" style=\"display:none; position: absolute; top: #{pair.r * 150}px; left: #{pair.c * 150}px;\">")
     $("#row#{pair.r}col#{pair.c}").fadeIn(50 * i)
 
-set_pairs()
-load_images()
+$('document').ready( ->
+  $('#tag_input').change( ->
+    tags = $(this).val()
+    photos = []
+    filled_pairs = {}
+    $('.grid_image').fadeOut('slow', -> 
+      $(this).remove()
+    )
+    set_pairs()
+    load_images()
+  )
+
+  set_pairs()
+  load_images()
+)
 
