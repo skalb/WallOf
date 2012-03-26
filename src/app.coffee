@@ -49,7 +49,6 @@ shuffle(pairs_to_fill)
     if (is_loading)
       return
 
-    should_create = false
     pairs_to_fill = []
     top_offset = -Math.ceil((ui.offset.top) / 150)
     bottom_offset =  top_offset + rows 
@@ -57,7 +56,6 @@ shuffle(pairs_to_fill)
     right_offset = left_offset + cols 
 
     if (ui.offset.top > last_top_position)
-      should_create = true
       for r in [top_offset..last_top_offset-1]
         for c in [left_offset..right_offset]
           pairs_to_fill.push({r: r, c: c})
@@ -65,7 +63,6 @@ shuffle(pairs_to_fill)
       last_top_offset = top_offset
 
     if (ui.offset.top < last_bottom_position)
-      should_create = true
       for r in [last_bottom_offset + 1..bottom_offset]
         for c in [left_offset..right_offset]
           pairs_to_fill.push({r: r, c: c})
@@ -73,7 +70,6 @@ shuffle(pairs_to_fill)
       last_bottom_offset = bottom_offset
 
     if (ui.offset.left > last_left_position)
-      should_create = true
       for r in [top_offset..bottom_offset]
         for c in [left_offset..last_left_offset-1]
           pairs_to_fill.push({r: r, c: c})
@@ -81,7 +77,6 @@ shuffle(pairs_to_fill)
       last_left_offset = left_offset
 
     if (ui.offset.left < last_right_position)
-      should_create = true
       for r in [top_offset..bottom_offset]
         for c in [last_right_offset + 1..right_offset]
           pairs_to_fill.push({r: r, c: c})
@@ -90,7 +85,7 @@ shuffle(pairs_to_fill)
 
     shuffle(pairs_to_fill)
 
-    if should_create
+    if pairs_to_fill.length > 0
       is_loading = true
       $(this).unbind(event)
       load_images()
@@ -102,16 +97,14 @@ shuffle(pairs_to_fill)
     if (!filled_pairs[pair.r])
       filled_pairs[pair.r] = {}
     else
-      if (!filled_pairs[pair.r][pair.c]))
+      if (!filled_pairs[pair.r][pair.c])
         filled_pairs[pair.r][pair.c] = 1
       else
         continue
-    do(pair, i) ->
-      setTimeout( ->
-        photo = data['photos']['photo'][i]
-        img_src = "http://farm#{photo.farm}.staticflickr.com/#{photo.server}/#{photo.id}_#{photo.secret}_q.jpg"
-        $('#main').append("<img src=\"#{img_src}\" style=\"position: absolute; top: #{pair.r * 150}px; left: #{pair.c * 150}px;\">")
-      , 10 * i)
+    photo = data['photos']['photo'][i]
+    img_src = "http://farm#{photo.farm}.staticflickr.com/#{photo.server}/#{photo.id}_#{photo.secret}_q.jpg"
+    $('#main').append("<img id=\"row#{pair.r}col#{pair.c}\" src=\"#{img_src}\" style=\"display:none; position: absolute; top: #{pair.r * 150}px; left: #{pair.c * 150}px;\">")
+    $("#row#{pair.r}col#{pair.c}").fadeIn(50 * i)
 
   is_loading = false
 
