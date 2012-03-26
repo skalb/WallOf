@@ -1,9 +1,11 @@
 (function() {
-  var cols, filled_pairs, is_loading, last_bottom_offset, last_bottom_position, last_left_offset, last_left_position, last_right_offset, last_right_position, last_top_offset, last_top_position, pairs_to_fill, photos, rows, tags;
+  var cols, filled_pairs, last_bottom_offset, last_bottom_position, last_left_offset, last_left_position, last_right_offset, last_right_position, last_top_offset, last_top_position, pairs_to_fill, photos, rows, tags;
 
   tags = "espresso";
 
   photos = [];
+
+  pairs_to_fill = [];
 
   filled_pairs = {};
 
@@ -15,6 +17,7 @@
       $('.grid_image').fadeOut('slow', function() {
         return $(this).remove();
       });
+      set_pairs();
       return load_images();
     });
   });
@@ -63,29 +66,26 @@
 
   last_right_offset = cols - 1;
 
-  is_loading = false;
-
-  this.get_pairs = function() {
-    var c, pairs, r, _ref, _ref2;
-    pairs = [];
+  this.set_pairs = function() {
+    var c, r, _ref, _ref2;
+    pairs_to_fill = [];
     for (r = 0, _ref = rows - 1; 0 <= _ref ? r <= _ref : r >= _ref; 0 <= _ref ? r++ : r--) {
       for (c = 0, _ref2 = cols - 1; 0 <= _ref2 ? c <= _ref2 : c >= _ref2; 0 <= _ref2 ? c++ : c--) {
-        pairs.push({
+        pairs_to_fill.push({
           r: r,
           c: c
         });
       }
     }
-    return pairs;
+    return shuffle(pairs_to_fill);
   };
-
-  pairs_to_fill = get_pairs();
-
-  shuffle(pairs_to_fill);
 
   this.jsonFlickrApi = function(data) {
     var i, img_src, pair, photo, _ref, _results;
-    if (data) photos = data['photos']['photo'];
+    if (data) {
+      photos = data['photos']['photo'];
+      $('#main').css("top", "0px").css("left", "0px");
+    }
     $('#main').draggable();
     $('#main').bind("dragstop", function(event, ui) {
       var bottom_offset, c, left_offset, r, right_offset, top_offset, _ref, _ref2, _ref3, _ref4;
@@ -168,6 +168,8 @@
     }
     return _results;
   };
+
+  set_pairs();
 
   load_images();
 

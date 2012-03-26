@@ -1,5 +1,6 @@
 tags = "espresso"
 photos = []
+pairs_to_fill = []
 filled_pairs = {}
 
 $('document').ready( ->
@@ -10,6 +11,7 @@ $('document').ready( ->
     $('.grid_image').fadeOut('slow', -> 
       $(this).remove()
     )
+    set_pairs()
     load_images()
   )
 )
@@ -46,21 +48,17 @@ last_bottom_offset = rows - 1
 last_right_position = 0
 last_right_offset = cols - 1
 
-is_loading = false
-
-@get_pairs = ->
-  pairs = []
+@set_pairs = ->
+  pairs_to_fill = []
   for r in [0..rows-1]
     for c in [0..cols-1]
-      pairs.push({r: r, c: c})
-  pairs
-
-pairs_to_fill = get_pairs()
-shuffle(pairs_to_fill)
+      pairs_to_fill .push({r: r, c: c})
+  shuffle(pairs_to_fill)
 
 @jsonFlickrApi = (data) ->
   if (data)
     photos = data['photos']['photo']
+    $('#main').css("top", "0px").css("left", "0px")
   $('#main').draggable()
   $('#main').bind("dragstop", (event, ui) ->
     pairs_to_fill = []
@@ -119,5 +117,6 @@ shuffle(pairs_to_fill)
     $('#main').append("<img id=\"row#{pair.r}col#{pair.c}\" class=\"grid_image\" src=\"#{img_src}\" style=\"display:none; position: absolute; top: #{pair.r * 150}px; left: #{pair.c * 150}px;\">")
     $("#row#{pair.r}col#{pair.c}").fadeIn(50 * i)
 
+set_pairs()
 load_images()
 
