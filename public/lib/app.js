@@ -12,7 +12,9 @@
       tags = $(this).val();
       photos = [];
       filled_pairs = {};
-      $('.grid_image').fadeOut('slow');
+      $('.grid_image').fadeOut('slow', function() {
+        return $(this).remove();
+      });
       return load_images();
     });
   });

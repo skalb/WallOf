@@ -7,7 +7,9 @@ $('document').ready( ->
     tags = $(this).val()
     photos = []
     filled_pairs = {}
-    $('.grid_image').fadeOut('slow')
+    $('.grid_image').fadeOut('slow', -> 
+      $(this).remove()
+    )
     load_images()
   )
 )
