@@ -51,24 +51,22 @@
   };
 
   this.shuffle = function(a) {
-    var j, n, temp, _results;
-    n = a.length - 1;
+    var j, n, temp, _ref, _results;
     _results = [];
-    while (n > 0) {
+    for (n = _ref = a.length - 1; _ref <= 0 ? n <= 0 : n >= 0; _ref <= 0 ? n++ : n--) {
       j = Math.floor(Math.random() * n);
       temp = a[j];
       a[j] = a[n];
-      a[n] = temp;
-      _results.push(n -= 1);
+      _results.push(a[n] = temp);
     }
     return _results;
   };
 
-  this.set_pairs = function() {
-    var c, r, _ref, _ref2;
+  this.set_pairs = function(row_start, row_end, col_start, col_end) {
+    var c, r;
     pairs_to_fill = [];
-    for (r = 0, _ref = rows - 1; 0 <= _ref ? r <= _ref : r >= _ref; 0 <= _ref ? r++ : r--) {
-      for (c = 0, _ref2 = cols - 1; 0 <= _ref2 ? c <= _ref2 : c >= _ref2; 0 <= _ref2 ? c++ : c--) {
+    for (r = row_start; row_start <= row_end ? r <= row_end : r >= row_end; row_start <= row_end ? r++ : r--) {
+      for (c = col_start; col_start <= col_end ? c <= col_end : c >= col_end; col_start <= col_end ? c++ : c--) {
         pairs_to_fill.push({
           r: r,
           c: c
@@ -79,64 +77,36 @@
   };
 
   this.jsonFlickrApi = function(data) {
-    var i, img_src, pair, photo, _ref, _results;
+    var i, image_style, img_id, img_src, pair, photo, _ref, _results;
     if (data) {
       photos = data['photos']['photo'];
       $('#main').css("top", "0px").css("left", "0px");
     }
     $('#main').draggable();
     $('#main').bind("dragstop", function(event, ui) {
-      var bottom_offset, c, left_offset, r, right_offset, top_offset, _ref, _ref2, _ref3, _ref4;
+      var bottom_offset, left_offset, right_offset, top_offset;
       pairs_to_fill = [];
       top_offset = -Math.ceil(ui.offset.top / 150);
       bottom_offset = top_offset + rows;
       left_offset = -Math.ceil(ui.offset.left / 150);
       right_offset = left_offset + cols;
       if (ui.offset.top > last_top_position) {
-        for (r = top_offset, _ref = last_top_offset - 1; top_offset <= _ref ? r <= _ref : r >= _ref; top_offset <= _ref ? r++ : r--) {
-          for (c = left_offset; left_offset <= right_offset ? c <= right_offset : c >= right_offset; left_offset <= right_offset ? c++ : c--) {
-            pairs_to_fill.push({
-              r: r,
-              c: c
-            });
-          }
-        }
+        set_pairs(top_offset, last_top_offset - 1, left_offset, right_offset);
         last_top_position += 150;
         last_top_offset = top_offset;
       }
       if (ui.offset.top < last_bottom_position) {
-        for (r = _ref2 = last_bottom_offset + 1; _ref2 <= bottom_offset ? r <= bottom_offset : r >= bottom_offset; _ref2 <= bottom_offset ? r++ : r--) {
-          for (c = left_offset; left_offset <= right_offset ? c <= right_offset : c >= right_offset; left_offset <= right_offset ? c++ : c--) {
-            pairs_to_fill.push({
-              r: r,
-              c: c
-            });
-          }
-        }
+        set_pairs(last_bottom_offset + 1, bottom_offset, left_offset, right_offset);
         last_bottom_offset -= 150;
         last_bottom_offset = bottom_offset;
       }
       if (ui.offset.left > last_left_position) {
-        for (r = top_offset; top_offset <= bottom_offset ? r <= bottom_offset : r >= bottom_offset; top_offset <= bottom_offset ? r++ : r--) {
-          for (c = left_offset, _ref3 = last_left_offset - 1; left_offset <= _ref3 ? c <= _ref3 : c >= _ref3; left_offset <= _ref3 ? c++ : c--) {
-            pairs_to_fill.push({
-              r: r,
-              c: c
-            });
-          }
-        }
+        set_pairs(top_offset, bottom_offset, left_offset, last_left_offset - 1);
         last_left_position += 150;
         last_left_offset = left_offset;
       }
       if (ui.offset.left < last_right_position) {
-        for (r = top_offset; top_offset <= bottom_offset ? r <= bottom_offset : r >= bottom_offset; top_offset <= bottom_offset ? r++ : r--) {
-          for (c = _ref4 = last_right_offset + 1; _ref4 <= right_offset ? c <= right_offset : c >= right_offset; _ref4 <= right_offset ? c++ : c--) {
-            pairs_to_fill.push({
-              r: r,
-              c: c
-            });
-          }
-        }
+        set_pairs(top_offset, bottom_offset, last_right_offset + 1, right_offset);
         last_right_offset -= 150;
         last_right_offset = right_offset;
       }
@@ -162,8 +132,10 @@
       photo = photos[i];
       if (photo) {
         img_src = "http://farm" + photo.farm + ".staticflickr.com/" + photo.server + "/" + photo.id + "_" + photo.secret + "_q.jpg";
-        $('#main').append("<img id=\"row" + pair.r + "col" + pair.c + "\" class=\"grid_image\" src=\"" + img_src + "\" style=\"display:none; position: absolute; top: " + (pair.r * 150) + "px; left: " + (pair.c * 150) + "px;\">");
-        _results.push($("#row" + pair.r + "col" + pair.c).fadeIn(50 * i));
+        img_id = "row" + pair.r + "col" + pair.c;
+        image_style = "display:none; position: absolute; top: " + (pair.r * 150) + "px; left: " + (pair.c * 150) + "px;";
+        $("#main").append("<img id=\"" + img_id + "\" class=\"grid_image\" src=\"" + img_src + "\" style=\"" + image_style + "\">");
+        _results.push($("#" + img_id).fadeIn(50 * i));
       } else {
         _results.push(void 0);
       }
@@ -179,10 +151,10 @@
       $('.grid_image').fadeOut('slow', function() {
         return $(this).remove();
       });
-      set_pairs();
+      set_pairs(0, rows - 1, 0, cols - 1);
       return load_images();
     });
-    set_pairs();
+    set_pairs(0, rows - 1, 0, cols - 1);
     return load_images();
   });
 
