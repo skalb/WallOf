@@ -1,11 +1,24 @@
 tags = "espresso"
-
+photos = []
 filled_pairs = {}
 
+$('document').ready( ->
+  $('#tag_input').change( ->
+    tags = $(this).val()
+    photos = []
+    filled_pairs = {}
+    $('.grid_image').fadeOut('slow')
+    load_images()
+  )
+)
+
 @load_images = ->
-  $.get("http://api.flickr.com/services/rest/?format=json&sort=relevance&method=flickr.photos.search&tags=#{tags}&api_key=a40767668cb729440a94acc78cd1e54b")
-  .error (jqXHR, textStatus, errorThrown) -> 
-    $('body').append "AJAX Error: #{errorThrown}."
+  if photos.length > 0
+    jsonFlickrApi()
+  else
+    $.get("http://api.flickr.com/services/rest/?format=json&sort=relevance&method=flickr.photos.search&tags=#{tags}&api_key=a40767668cb729440a94acc78cd1e54b&per_page=500")
+    .error (jqXHR, textStatus, errorThrown) -> 
+      $('body').append "AJAX Error: #{errorThrown}."
 
 @shuffle = (a) ->
   n = a.length - 1
@@ -44,12 +57,12 @@ pairs_to_fill = get_pairs()
 shuffle(pairs_to_fill)
 
 @jsonFlickrApi = (data) ->
+  if (data)
+    photos = data['photos']['photo']
   $('#main').draggable()
   $('#main').bind("dragstop", (event, ui) ->
-    if (is_loading)
-      return
-
     pairs_to_fill = []
+
     top_offset = -Math.ceil((ui.offset.top) / 150)
     bottom_offset =  top_offset + rows 
     left_offset = -Math.ceil((ui.offset.left) / 150)
@@ -86,11 +99,9 @@ shuffle(pairs_to_fill)
     shuffle(pairs_to_fill)
 
     if pairs_to_fill.length > 0
-      is_loading = true
       $(this).unbind(event)
       load_images()
   )
-  photos = data['photos']['photo']
   shuffle(photos)
   for i in [0..pairs_to_fill.length-1]
     pair = pairs_to_fill[i]
@@ -101,12 +112,10 @@ shuffle(pairs_to_fill)
         filled_pairs[pair.r][pair.c] = 1
       else
         continue
-    photo = data['photos']['photo'][i]
+    photo = photos[i]
     img_src = "http://farm#{photo.farm}.staticflickr.com/#{photo.server}/#{photo.id}_#{photo.secret}_q.jpg"
-    $('#main').append("<img id=\"row#{pair.r}col#{pair.c}\" src=\"#{img_src}\" style=\"display:none; position: absolute; top: #{pair.r * 150}px; left: #{pair.c * 150}px;\">")
+    $('#main').append("<img id=\"row#{pair.r}col#{pair.c}\" class=\"grid_image\" src=\"#{img_src}\" style=\"display:none; position: absolute; top: #{pair.r * 150}px; left: #{pair.c * 150}px;\">")
     $("#row#{pair.r}col#{pair.c}").fadeIn(50 * i)
-
-  is_loading = false
 
 load_images()
 
