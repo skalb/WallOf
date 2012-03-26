@@ -47,7 +47,6 @@ last_right_offset = cols - 1
     a[n] = temp
 
 @set_pairs = (row_start, row_end, col_start, col_end) ->
-  pairs_to_fill = []
   for r in [row_start..row_end]
     for c in [col_start..col_end]
       pairs_to_fill.push({r: r, c: c})
@@ -96,17 +95,11 @@ last_right_offset = cols - 1
   shuffle(photos)
   for i in [0..pairs_to_fill.length-1]
     pair = pairs_to_fill[i]
-    if (!filled_pairs[pair.r])
-      filled_pairs[pair.r] = {}
-    else
-      if (!filled_pairs[pair.r][pair.c])
-        filled_pairs[pair.r][pair.c] = 1
-      else
-        continue
+    img_id = "row#{pair.r}col#{pair.c}"
     photo = photos[i]
-    if photo
+    if photo && !filled_pairs[img_id]
+      filled_pairs[img_id] = 1
       img_src = "http://farm#{photo.farm}.staticflickr.com/#{photo.server}/#{photo.id}_#{photo.secret}_q.jpg"
-      img_id = "row#{pair.r}col#{pair.c}"
       image_style = "display:none; position: absolute; top: #{pair.r * 150}px; left: #{pair.c * 150}px;"
       $("#main").append("<img id=\"#{img_id}\" class=\"grid_image\" src=\"#{img_src}\" style=\"#{image_style}\">")
       $("##{img_id}").fadeIn(50 * i)
@@ -119,6 +112,7 @@ $('document').ready( ->
     $('.grid_image').fadeOut('slow', -> 
       $(this).remove()
     )
+    reset_grid()
     set_pairs(0, rows - 1, 0, cols - 1)
     load_images()
   )

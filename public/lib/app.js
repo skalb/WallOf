@@ -64,7 +64,6 @@
 
   this.set_pairs = function(row_start, row_end, col_start, col_end) {
     var c, r;
-    pairs_to_fill = [];
     for (r = row_start; row_start <= row_end ? r <= row_end : r >= row_end; row_start <= row_end ? r++ : r--) {
       for (c = col_start; col_start <= col_end ? c <= col_end : c >= col_end; col_start <= col_end ? c++ : c--) {
         pairs_to_fill.push({
@@ -120,19 +119,11 @@
     _results = [];
     for (i = 0, _ref = pairs_to_fill.length - 1; 0 <= _ref ? i <= _ref : i >= _ref; 0 <= _ref ? i++ : i--) {
       pair = pairs_to_fill[i];
-      if (!filled_pairs[pair.r]) {
-        filled_pairs[pair.r] = {};
-      } else {
-        if (!filled_pairs[pair.r][pair.c]) {
-          filled_pairs[pair.r][pair.c] = 1;
-        } else {
-          continue;
-        }
-      }
+      img_id = "row" + pair.r + "col" + pair.c;
       photo = photos[i];
-      if (photo) {
+      if (photo && !filled_pairs[img_id]) {
+        filled_pairs[img_id] = 1;
         img_src = "http://farm" + photo.farm + ".staticflickr.com/" + photo.server + "/" + photo.id + "_" + photo.secret + "_q.jpg";
-        img_id = "row" + pair.r + "col" + pair.c;
         image_style = "display:none; position: absolute; top: " + (pair.r * 150) + "px; left: " + (pair.c * 150) + "px;";
         $("#main").append("<img id=\"" + img_id + "\" class=\"grid_image\" src=\"" + img_src + "\" style=\"" + image_style + "\">");
         _results.push($("#" + img_id).fadeIn(50 * i));
@@ -151,6 +142,7 @@
       $('.grid_image').fadeOut('slow', function() {
         return $(this).remove();
       });
+      reset_grid();
       set_pairs(0, rows - 1, 0, cols - 1);
       return load_images();
     });
