@@ -1,6 +1,5 @@
 require 'sinatra' 
 
 get '/' do 
-  # redirect '/index.html' 
-  "Hello World!"
+  redirect '/index.html' 
 end
