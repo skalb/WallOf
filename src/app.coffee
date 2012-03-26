@@ -35,7 +35,7 @@ last_right_offset = cols - 1
   if photos.length > 0
     jsonFlickrApi()
   else
-    $.get("http://api.flickr.com/services/rest/?format=json&sort=relevance&method=flickr.photos.search&tags=#{tags}&api_key=a40767668cb729440a94acc78cd1e54b&per_page=500")
+    $.get("http://api.flickr.com/services/rest/?format=json&sort=relevance&method=flickr.photos.search&tags=#{tags}&api_key=a40767668cb729440a94acc78cd1e54b&per_page=500&safe_search=1")
     .error (jqXHR, textStatus, errorThrown) -> 
       $('body').append "AJAX Error: #{errorThrown}."
 
@@ -113,9 +113,10 @@ last_right_offset = cols - 1
       else
         continue
     photo = photos[i]
-    img_src = "http://farm#{photo.farm}.staticflickr.com/#{photo.server}/#{photo.id}_#{photo.secret}_q.jpg"
-    $('#main').append("<img id=\"row#{pair.r}col#{pair.c}\" class=\"grid_image\" src=\"#{img_src}\" style=\"display:none; position: absolute; top: #{pair.r * 150}px; left: #{pair.c * 150}px;\">")
-    $("#row#{pair.r}col#{pair.c}").fadeIn(50 * i)
+    if photo
+      img_src = "http://farm#{photo.farm}.staticflickr.com/#{photo.server}/#{photo.id}_#{photo.secret}_q.jpg"
+      $('#main').append("<img id=\"row#{pair.r}col#{pair.c}\" class=\"grid_image\" src=\"#{img_src}\" style=\"display:none; position: absolute; top: #{pair.r * 150}px; left: #{pair.c * 150}px;\">")
+      $("#row#{pair.r}col#{pair.c}").fadeIn(50 * i)
 
 $('document').ready( ->
   $('#tag_input').change( ->

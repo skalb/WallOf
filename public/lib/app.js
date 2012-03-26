@@ -44,7 +44,7 @@
     if (photos.length > 0) {
       return jsonFlickrApi();
     } else {
-      return $.get("http://api.flickr.com/services/rest/?format=json&sort=relevance&method=flickr.photos.search&tags=" + tags + "&api_key=a40767668cb729440a94acc78cd1e54b&per_page=500").error(function(jqXHR, textStatus, errorThrown) {
+      return $.get("http://api.flickr.com/services/rest/?format=json&sort=relevance&method=flickr.photos.search&tags=" + tags + "&api_key=a40767668cb729440a94acc78cd1e54b&per_page=500&safe_search=1").error(function(jqXHR, textStatus, errorThrown) {
         return $('body').append("AJAX Error: " + errorThrown + ".");
       });
     }
@@ -160,9 +160,13 @@
         }
       }
       photo = photos[i];
-      img_src = "http://farm" + photo.farm + ".staticflickr.com/" + photo.server + "/" + photo.id + "_" + photo.secret + "_q.jpg";
-      $('#main').append("<img id=\"row" + pair.r + "col" + pair.c + "\" class=\"grid_image\" src=\"" + img_src + "\" style=\"display:none; position: absolute; top: " + (pair.r * 150) + "px; left: " + (pair.c * 150) + "px;\">");
-      _results.push($("#row" + pair.r + "col" + pair.c).fadeIn(50 * i));
+      if (photo) {
+        img_src = "http://farm" + photo.farm + ".staticflickr.com/" + photo.server + "/" + photo.id + "_" + photo.secret + "_q.jpg";
+        $('#main').append("<img id=\"row" + pair.r + "col" + pair.c + "\" class=\"grid_image\" src=\"" + img_src + "\" style=\"display:none; position: absolute; top: " + (pair.r * 150) + "px; left: " + (pair.c * 150) + "px;\">");
+        _results.push($("#row" + pair.r + "col" + pair.c).fadeIn(50 * i));
+      } else {
+        _results.push(void 0);
+      }
     }
     return _results;
   };
