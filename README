@@ -1,0 +1,5 @@
+Prototype of an infinite scrollable image app.
+
+Inspired by the Wall of Music iPhone app.
+
+Demo at: http://falling-moon-7032.heroku.com/index.html (note: it can take 10-15 seconds to load the Flickr images)
